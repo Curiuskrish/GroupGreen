@@ -1,5 +1,6 @@
 // ChatBot.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { useLanguage } from './LanguageContext';
 
 const API_KEY = "AIzaSyCrfTRsygEaIl6ndzu3FJrbFAfMyg5n37M"; // Replace with ENV var in prod
 
@@ -8,16 +9,19 @@ const ChatBot = () => {
   const [input, setInput] = useState('');
   const chatRef = useRef(null);
   const textareaRef = useRef(null);
+   const { language } = useLanguage();
+
 
   // Scroll to bottom whenever a new message is added
   useEffect(() => {
+
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
 
   const askGemini = async (topic) => {
-    const defaultPrompt = `respond to give ${topic}`;
+    const defaultPrompt = `respond to give ${topic} ,give response only in ${language} language`;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {

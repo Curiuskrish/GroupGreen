@@ -1,189 +1,38 @@
-import { useEffect, useRef, useState } from "react";
+// App.jsx
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./Home";
+import ChatApp from "./ChatApp";
+import CropPage from "./CropPage";
+import Chatbot from "./chatbot";
+import Schemes from "./components/Schemes";
+import Sidebar from "./components/Navbar";
+import PlantDiseaseUI from "./components/PlantDiseaseDetector";
+import { LanguageProvider } from "./LanguageContext";
 import { Auth } from "./components/Auth";
-import { Cookies } from "react-cookie";
-import Chatro from "./components/Chatro";
-import "./App.css";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase";
-import PlantDiseaseUI from "./components/PlantDiseaseDetector.jsx";
+import { LocationProvider } from "./LocationContext";
 
 
-import WeatherApp from "./Weather.jsx";
-import LocationPicker from "./Map.jsx";
-import CropPredictor from "./CropPredictor.jsx";
-import Graphs from "./Graphs.jsx";
-import Graphs2 from "./Graphs2.jsx";
-
-import ChatRoomList from "./ChatRoomList.jsx";
-
-
-import UserList from "./UserList.jsx";
-import ChatApp from "./ChatApp.jsx";
-import Schemes from "./components/Schemes.jsx";
-import ChatBot from "./chatbot.jsx";
-
-
-
-
-
-const cookies = new Cookies();
 
 function App() {
-  const [allRooms, setAllRooms] = useState([]);
-  const [coords, setCoords] = useState(null);
-  const [crop, setCrop] = useState(null);
-  const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-  const [room, setRoom] = useState(null);
-  const roomInputRef = useRef(null);
-const [language, setLanguage] = useState("English");
-  // useEffect(() => {
-  //   const fetchRooms = async () => {
-  //     try {
-  //       const roomRef = collection(db, "chatrooms");
-  //       const snapshot = await getDocs(roomRef);
-  //       const roomNames = snapshot.docs.map((doc) => doc.id);
-  //       console.log("Fetched Rooms:", roomNames);
-  //       setAllRooms(roomNames);
-  //     } catch (err) {
-  //       console.error("Failed to fetch rooms:", err);
-  //     }
-  //   };
-
-  //   fetchRooms();
-  // }, []);
-
-useEffect(() => {
-  if (!isAuth) return; // 🛑 Don't try to fetch if not logged in
-
-  const fetchRooms = async () => {
-    try {
-      const roomRef = collection(db, "chatrooms");
-      const snapshot = await getDocs(roomRef);
-      const roomNames = snapshot.docs.map(doc => doc.id);
-      console.log("ROOMS:", roomNames);
-      setAllRooms(roomNames);
-    } catch (err) {
-      console.error("❌ Failed to fetch rooms:", err);
-    }
-  };
-
-  fetchRooms();
-}, [isAuth]); // 👈 Add isAuth as a dependency
-
-  if (!isAuth) {
-    return (
-      <div className="  items-center justify-center min-h-screen bg-gradient-to-tr from-green-100 to-green-200">
-        <Auth setIsAuth={setIsAuth} />
-      </div>
-    );
-  }
-
   return (
-    <div className="  [100vw] m-auto  text-center  -col lg: -row min-h-screen bg-gray-100">
-      💬 Left: Chat Section
-
-
-      
-      <div className="lg:  1/2   full p-4 bg-white shado  md z-10">
-        {!room ? (
-          <div className="   -col gap-6 items-center justify-center mt-10">
-            <div className="text-center">
-            
-              <label className="text-xl font-semibold text-green-700 mb-2 block">
-                🌾 Enter Room Name
-              </label>
-              <input
-                ref={roomInputRef}
-                type="text"
-                placeholder="Ex: cotton-telangana"
-                className="  72 p-3 border-2 border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-              />
-              <button
-                onClick={() => setRoom(roomInputRef.current.value)}
-                className="mt-3 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition"
-              >
-                Enter Chat
-              </button>
-            <button onClick={()=>{
-              cookies.remove("auth-token")
-              
-            }}>Logout</button>
-             <input onChange={(e)=>{
-              setLanguage(e.target.value)
-             }} type="text" value={language} name="" id="" />
-            </div>
-            
-
-            {/* 📋 Room List */}
-            <div className="  full">
-              <h3 className="text-lg font-semibold mb-2 text-green-800 text-center">
-                📁 Available Rooms:
-              </h3>
-              <ul className="   -wrap justify-center gap-2">
-                {allRooms.length === 0 ? (
-                  <li className="text-gray-500">No rooms found</li>
-                ) : (
-                  allRooms.map((roomName) => (
-                    <li
-                      key={roomName}
-                      onClick={() => setRoom(roomName)}
-                      className="cursor-pointer bg-white border border-green-400 px-3 py-1 rounded-full text-green-700 text-sm hover:bg-green-100 transition"
-                    >
-                      {roomName}
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          </div>
-        ) : (
-          <>
-           
-            {/* <Chatro room={room} /> */}
-            <div className="  justify-center mt-4">
-              <button
-                onClick={() => setRoom(null)}
-                className="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
-              >
-                🔙 Leave Room
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-      {/* 📊 Right: Dashboard Section */}
-      <div className="lg:  1/2   full p-6    -col gap-4 overflo  y-auto bg-green-50">
-        <div className="min-h-[20vh] bg-gray-100">
-          <ChatApp room={room} setRoom={setRoom}/>
-      
-        
-  </div>
-
-        <LocationPicker onLocationSelect={setCoords} />
-        {/* <IrrigationPlanner/> */}
-        {coords && (
-          <>
-            <WeatherApp lat={coords.lat} lon={coords.lng} />
-            <CropPredictor
-              setCropDrop={setCrop}
-              lat={coords.lat}
-              lon={coords.lng}
-            />
-            <Graphs lat={coords.lat} lon={coords.lng} crop={crop} />
-            <Graphs2 lat={coords.lat} lon={coords.lng} crop={crop} />
-            
-            {/* <UserList/> */}
-          </>
-          
-        )}
-        <div style={{}} className="chatbot">
-          <ChatBot/>
+    <>
+    <LanguageProvider> {/* ✅ Wrap everything in Language Context */}
+      <Router>
+        <div className="min-h-screen bg-gray-50 text-gray-800">
+          <Sidebar /> {/* Navbar stays outside of Routes */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/chat" element={<ChatApp />} />
+            <Route path="/login" element={<Auth />} /> {/* 👈 New route */}
+            <Route path="/crop" element={<CropPage />} />
+            <Route path="/detect" element={<PlantDiseaseUI />} />
+            <Route path="/comfort" element={<Chatbot />} />
+            <Route path="/schemes" element={<Schemes />} />
+          </Routes>
         </div>
-        <PlantDiseaseUI/>
-        <Schemes/>
-        {/* <MainPage/> */}
-      </div>
-    </div>
+      </Router>
+    </LanguageProvider></>
   );
 }
 
