@@ -1,0 +1,7 @@
+@import "tailwindcss";
+.sec{
+    width: 80%;
+    margin: auto;
+    border: slateblue solid 3px;
+    
+}
