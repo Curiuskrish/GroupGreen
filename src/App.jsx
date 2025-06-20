@@ -20,6 +20,7 @@ import ChatRoomList from "./ChatRoomList.jsx";
 import UserList from "./UserList.jsx";
 import ChatApp from "./ChatApp.jsx";
 import Schemes from "./components/Schemes.jsx";
+import ChatBot from "./chatbot.jsx";
 
 
 
@@ -175,6 +176,9 @@ useEffect(() => {
           </>
           
         )}
+        <div style={{}} className="chatbot">
+          <ChatBot/>
+        </div>
         <PlantDiseaseUI/>
         <Schemes/>
         {/* <MainPage/> */}

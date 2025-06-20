@@ -30,7 +30,7 @@ const Chatro = ({ room }) => {
         id: doc.id,
       }));
       setMessages(msgs);
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      // setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     });
     return () => unsub();
   }, [room, msgRef]);
