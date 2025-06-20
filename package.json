@@ -10,16 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@gradio/client": "^1.15.3",
     "@react-google-maps/api": "^2.20.6",
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
     "chart.js": "^4.5.0",
     "firebase": "^11.9.1",
     "leaflet": "^1.9.4",
+    "lucide-react": "^0.518.0",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",
+    "recharts": "^2.15.3",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {

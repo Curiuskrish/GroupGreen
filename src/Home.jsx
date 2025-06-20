@@ -5,36 +5,27 @@ import Chatro from "./components/Chatro";
 import "./App.css";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
-import PlantDiseaseUI from "./components/PlantDiseaseDetector.jsx";
-
-
+{/* <MainPage/> */}
 import WeatherApp from "./Weather.jsx";
 import LocationPicker from "./Map.jsx";
 import CropPredictor from "./CropPredictor.jsx";
 import Graphs from "./Graphs.jsx";
 import Graphs2 from "./Graphs2.jsx";
-
+import IrrigationPlanner from "./components/IrrigationPlanner.jsx";
 import ChatRoomList from "./ChatRoomList.jsx";
-
-
-import UserList from "./UserList.jsx";
-import ChatApp from "./ChatApp.jsx";
-import Schemes from "./components/Schemes.jsx";
-
-
-
-
+import MainPage from "./mainpage.jsx";
+// import UserList from "./User.jsx";
 
 const cookies = new Cookies();
 
-function App() {
+function Home() {
   const [allRooms, setAllRooms] = useState([]);
   const [coords, setCoords] = useState(null);
   const [crop, setCrop] = useState(null);
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState(null);
   const roomInputRef = useRef(null);
-const [language, setLanguage] = useState("English");
+
   // useEffect(() => {
   //   const fetchRooms = async () => {
   //     try {
@@ -79,15 +70,11 @@ useEffect(() => {
 
   return (
     <div className="  [100vw] m-auto  text-center  -col lg: -row min-h-screen bg-gray-100">
-      💬 Left: Chat Section
-
-
-      
+      {/* 💬 Left: Chat Section */}
       <div className="lg:  1/2   full p-4 bg-white shado  md z-10">
         {!room ? (
           <div className="   -col gap-6 items-center justify-center mt-10">
             <div className="text-center">
-            
               <label className="text-xl font-semibold text-green-700 mb-2 block">
                 🌾 Enter Room Name
               </label>
@@ -103,13 +90,6 @@ useEffect(() => {
               >
                 Enter Chat
               </button>
-            <button onClick={()=>{
-              cookies.remove("auth-token")
-              
-            }}>Logout</button>
-             <input onChange={(e)=>{
-              setLanguage(e.target.value)
-             }} type="text" value={language} name="" id="" />
             </div>
             
 
@@ -137,8 +117,7 @@ useEffect(() => {
           </div>
         ) : (
           <>
-           
-            {/* <Chatro room={room} /> */}
+            <Chatro room={room} />
             <div className="  justify-center mt-4">
               <button
                 onClick={() => setRoom(null)}
@@ -150,12 +129,14 @@ useEffect(() => {
           </>
         )}
       </div>
+
       {/* 📊 Right: Dashboard Section */}
       <div className="lg:  1/2   full p-6    -col gap-4 overflo  y-auto bg-green-50">
-        <div className="min-h-[20vh] bg-gray-100">
-          <ChatApp room={room} setRoom={setRoom}/>
-      
-        
+        <h1 className="text-2xl font-bold text-green-700 text-center">
+          🌦️ Smart Farmer Dashboard
+        </h1>
+          <div className="min-h-[20vh] bg-gray-100">
+    <ChatRoomList />
   </div>
 
         <LocationPicker onLocationSelect={setCoords} />
@@ -170,17 +151,14 @@ useEffect(() => {
             />
             <Graphs lat={coords.lat} lon={coords.lng} crop={crop} />
             <Graphs2 lat={coords.lat} lon={coords.lng} crop={crop} />
-            
             {/* <UserList/> */}
           </>
           
         )}
-        <PlantDiseaseUI/>
-        <Schemes/>
-        {/* <MainPage/> */}
+        <MainPage/>
       </div>
     </div>
   );
 }
 
-export default App;
+export default Home;

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useEffect } from 'react';
-
 function Chat() {
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState([]);
