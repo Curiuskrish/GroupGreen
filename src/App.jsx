@@ -13,6 +13,7 @@ import { LocationProvider } from "./LocationContext";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Dashboard from "./Dashboard";
 
 function App() {
   useEffect(() => {
@@ -30,6 +31,7 @@ function App() {
           <main className="pt-4 pb-12 px-4 md:px-8 lg:px-16">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/chat" element={<ChatApp />} />
               <Route path="/login" element={<Auth />} />
               <Route path="/crop" element={<CropPage />} />

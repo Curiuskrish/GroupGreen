@@ -11,14 +11,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLanguage } from "./LanguageContext";
 
-// 🧷 Fix Leaflet marker icon paths
+// 🧷 Fix the default marker icons (Leaflet doesn't bundle them properly)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// 🔁 Auto-pan map when new location is set
+// ⛳ Auto-pan map on location change
 const RecenterMap = ({ position }) => {
   const map = useMap();
   useEffect(() => {
@@ -29,7 +29,7 @@ const RecenterMap = ({ position }) => {
   return null;
 };
 
-// 🎯 Handle user clicks on map
+// 🎯 Handle map clicks
 const MapClickHandler = ({ setShowMap }) => {
   const { setLocation } = useLanguage();
   useMapEvents({
@@ -59,49 +59,42 @@ const Map = ({ setShowMap }) => {
         },
         (err) => {
           console.error("Location error:", err);
-          alert("Failed to get your location.");
+          alert("Failed to get location.");
         }
       );
     }
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-2xl p-6 border border-gray-200 mb-6 max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">🌍 Choose Your Location</h2>
-
+    <div className="bg-white shadow-md rounded-md p-4 border border-gray-300 mb-4">
       <button
         onClick={handleGetLocation}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition-all mb-4"
+        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
       >
         📍 Use Current Location
       </button>
 
-      <div className="rounded-2xl overflow-hidden border-2 border-blue-200">
+      <div className="rounded-xl overflow-hidden">
         <MapContainer
-          center={location || [17.385, 78.4867]} // Default: Hyderabad
+          center={location || [17.385, 78.4867]} // fallback to Hyderabad
           zoom={13}
           style={{
-            height: "320px",
+            height: "300px",
             width: "100%",
             borderRadius: "1rem",
           }}
-          className="z-0"
         >
           <TileLayer
             attribution="© OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-
           <MapClickHandler setShowMap={setShowMap} />
           {location && <RecenterMap position={location} />}
-
           {location && (
             <Marker position={location}>
-              <Popup className="text-sm font-medium">
-                📍 Selected Location
-                <br />
-                Lat: {location.lat.toFixed(3)}
-                <br />
+              <Popup>
+                📍 Selected Location <br />
+                Lat: {location.lat.toFixed(3)} <br />
                 Lon: {location.lng.toFixed(3)}
               </Popup>
             </Marker>

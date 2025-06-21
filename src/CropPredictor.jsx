@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from './LanguageContext';
 
-const API_KEY = 'AIzaSyCrfTRsygEaIl6ndzu3FJrbFAfMyg5n37M'; // Replace with env in production
+const API_KEY = 'AIzaSyCrfTRsygEaIl6ndzu3FJrbFAfMyg5n37M'; // your Gemini key
 
 const CropPredictor = ({ lat, lon, setCropDrop }) => {
   const [loading, setLoading] = useState(false);
@@ -17,15 +17,47 @@ Given a location with these coordinates:
 - Latitude: ${latitude}
 - Longitude: ${longitude}
 - give response only in ${language}
+✅ Before making recommendations, you MUST:
+1. Validate that the coordinates are located on land.
+2. Ensure the location is within the geographical boundaries of **India**.
+3. Confirm that the area is **suitable for agricultural farming** (e.g., not water bodies, cities, deserts, or rocky terrain).
 
-... [prompt continues] ...
-    `;
+If ANY of the above checks fail, return ONLY:
+{
+  "crops": ["no crops"]
+}
+
+~✅ If the location is valid:
+Return ONLY a JSON object with a single key "crops" containing an array of up to **10 most suitable, high-income generating crops** that can be cultivated there based on local **soil type, climate conditions, water availability**, and **seasonal trends**.
+
+Each crop should include the following keys:
+- "name": Name of the crop (e.g., "Cotton", "Paddy", "Tomato")
+- "how_to_grow": A short, practical guide to growing it
+- "water_needs": Water requirements (e.g., "High", "Moderate", "Low")
+- "sunlight": Ideal sunlight exposure (e.g., "Full Sun", "Partial Shade")
+- "soil_type": Suitable soil types (e.g., "Loamy", "Sandy Loam")
+- "yield_info": Typical yield (e.g., "2.5 tons/acre" or "800 kg/hectare")
+
+🧠 Prioritize **cash crops, fruits, vegetables, or pulses** that are economically viable, in-demand in the Indian market, and commonly supported by local mandis or agro-industries.
+
+🚫 Do not guess. If uncertain about the region or missing data, return:
+{
+  "crops": ["no crops"]
+}
+
+📦 Output must be:
+- **Strictly JSON**
+- No markdown
+- No extra text, description, or formatting
+`;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         contents: [
           {
@@ -53,8 +85,7 @@ Given a location with these coordinates:
         const clean = reply.trim().replace(/```json\s*|\s*```/g, '');
         const json = JSON.parse(clean);
         setCrops(json.crops);
-
-        if (json.crops && json.crops.length > 0 && json.crops[0] !== 'no crops') {
+        if (json.crops && json.crops.length > 0 && json.crops[0] !== "no crops") {
           setCropDrop(json.crops[0].name);
         }
       } catch (err) {
@@ -69,39 +100,25 @@ Given a location with these coordinates:
   }, [lat, lon, setCropDrop]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white/70 backdrop-blur-md rounded-2xl shadow-md border border-green-200 text-[#1f3b29]">
-      <h1 className="text-2xl font-bold text-center text-green-800 mb-6">
+    <div className="max-w-3xl mx-auto p-6 bg-green-50 min-h-[20vh]">
+      <h1 className="text-3xl font-bold text-center text-green-700 mb-6">
         🌾 Crop Predictor (Gemini AI)
       </h1>
 
       {!lat || !lon ? (
-        <p className="text-center text-gray-600">
-          📍 Waiting for location input...
-        </p>
+        <p className="text-center text-gray-600">📍 Waiting for location input...</p>
       ) : loading ? (
-        <p className="text-center text-gray-500 animate-pulse">
-          🌍 Predicting crops for your location...
-        </p>
+        <p className="text-center text-gray-500">🌍 Predicting crops for your location...</p>
       ) : error ? (
-        <div className="text-red-700 bg-red-100 border border-red-300 rounded-lg p-4 text-center font-medium">
-          {error}
-        </div>
+        <div className="text-red-600 bg-red-100 p-3 rounded">{error}</div>
       ) : crops && crops.length === 1 && crops[0] === 'no crops' ? (
-        <p className="text-center text-red-600 font-semibold">
-          🚫 No suitable crops found for this location.
-        </p>
+        <p className="text-red-600 font-bold text-center">🚫 No suitable crops found for this location.</p>
       ) : crops ? (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-green-700 text-left">🌿 Top Recommended Crops</h2>
-
+        <>
+          <h2 className="text-xl font-semibold mb-4">Top 10 Crops 🌿</h2>
           {crops.map((crop, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-green-200 rounded-xl p-4 shadow-sm"
-            >
-              <h3 className="text-lg font-bold text-green-800 mb-2">
-                🌱 {idx + 1}. {crop.name}
-              </h3>
+            <div key={idx} className="bg-white shadow p-4 rounded border border-green-200 mb-4">
+              <h3 className="text-lg font-bold mb-2">🌱 {idx + 1}. {crop.name}</h3>
               <p><strong>How to Grow:</strong> {crop.how_to_grow}</p>
               <p><strong>Water Needs:</strong> {crop.water_needs}</p>
               <p><strong>Sunlight:</strong> {crop.sunlight}</p>
@@ -109,23 +126,12 @@ Given a location with these coordinates:
               <p><strong>Yield Info:</strong> {crop.yield_info || 'N/A'}</p>
             </div>
           ))}
-
-          <div className="mt-6 text-center">
-            <label className="block text-green-800 font-medium mb-2">
-              Select a crop to analyze further:
-            </label>
-            <select
-              className="w-64 px-4 py-2 border border-green-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-              onChange={(e) => setCropDrop(e.target.value)}
-            >
-              {crops.map((crop, idx) => (
-                <option key={idx} value={crop.name}>
-                  🌱 {idx + 1}. {crop.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+          <select onChange={(e) => setCropDrop(e.target.value)} style={{ width: "30%", margin: "auto" }}>
+            {crops.map((crop, idx) => (
+              <option key={idx} value={crop.name}>🌱 {idx + 1}. {crop.name}</option>
+            ))}
+          </select>
+        </>
       ) : null}
     </div>
   );

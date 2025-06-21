@@ -38,6 +38,7 @@ Do NOT return markdown or explanation.
     `.trim();
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -48,6 +49,8 @@ Do NOT return markdown or explanation.
 
     const resData = await response.json();
     const raw = resData?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+
+    // Strip unwanted "```json" or "```" if they appear
     return raw.trim().replace(/```json|```/g, '');
   };
 
@@ -56,6 +59,12 @@ Do NOT return markdown or explanation.
       instanceRef.current.destroy();
     }
 
+    const key = label.toLowerCase().includes('yield')
+      ? 'yields'
+      : label.toLowerCase().includes('rate')
+      ? 'rates'
+      : 'profits';
+
     instanceRef.current = new Chart(ctx, {
       type: 'line',
       data: {
@@ -63,9 +72,9 @@ Do NOT return markdown or explanation.
         datasets: [
           {
             label,
-            data: data[label.toLowerCase().split(' ')[0]], // maps to yields, rates, profits
+            data: data[key],
             borderColor: color,
-            backgroundColor: `${color}1A`, // ~10% alpha
+            backgroundColor: `${color}1A`,
             tension: 0.3,
             borderWidth: 2,
             fill: true,

@@ -1,50 +1,41 @@
-import { useState, lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
-import { Cookies } from "react-cookie";
-import Auth from "./components/Auth";
-import Nav from "./components/Navbar";
-import "./App.css";
+// src/Home.jsx
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Auth } from "./components/Auth";
+import { useLanguage } from "./LanguageContext";
+import { auth } from "./firebase";
 
-const Dashboard = lazy(() => import("./Dashboard"));
-const CropPage = lazy(() => import("./CropPage"));
-const WeatherApp = lazy(() => import("./Weather"));
-const PlantDiseaseUI = lazy(() => import("./components/PlantDiseaseDetector"));
-const Schemes = lazy(() => import("./components/Schemes"));
-const ChatApp = lazy(() => import("./ChatApp"));
+const Home = () => {
+  const navigate = useNavigate();
+  const { location } = useLanguage();
 
-const cookies = new Cookies();
+  // 👀 Redirect if user is already logged in
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate("/dashboard"); // 🌍 Redirect to dashboard
+      }
+    });
 
-function MainApp() {
-  const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-
-  const handleLogout = () => {
-    cookies.remove("auth-token");
-    setIsAuth(false);
-  };
-
-  if (!isAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-green-100 to-green-200">
-        <Auth setIsAuth={setIsAuth} />
-      </div>
-    );
-  }
+    return () => unsubscribe();
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Nav onLogout={handleLogout} />
-      <Suspense fallback={<div className="text-center p-4">Loading...</div>}>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/crop-tools" element={<CropPage />} />
-          <Route path="/weather" element={<WeatherApp />} />
-          <Route path="/disease" element={<PlantDiseaseUI />} />
-          <Route path="/schemes" element={<Schemes />} />
-          <Route path="/chat" element={<ChatApp />} />
-        </Routes>
-      </Suspense>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-50 p-8 text-center">
+      <div className="glass-card p-8 rounded-3xl shadow-2xl max-w-xl w-full space-y-6">
+        <h1 className="text-4xl font-extrabold text-green-700">🌱 Welcome to GreenConnect</h1>
+        <p className="text-lg text-gray-700">
+          Empowering{" "}
+          <span className="text-green-600 font-bold">Farmers</span>,{" "}
+          <span className="text-green-600 font-bold">Vendors</span>, and{" "}
+          <span className="text-green-600 font-bold">Experts</span> with one smart, green dashboard 🌍
+        </p>
+
+        {/* 🔐 Show Auth only if not logged in */}
+        <Auth setIsAuth={() => {}} />
+      </div>
     </div>
   );
-}
+};
 
-export default MainApp;
+export default Home;
