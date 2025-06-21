@@ -11,35 +11,34 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLanguage } from "./LanguageContext";
 
+// 🧷 Fix Leaflet marker icon paths
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// ⛳ this component will move the map to the new position
+// 🔁 Auto-pan map when new location is set
 const RecenterMap = ({ position }) => {
   const map = useMap();
   useEffect(() => {
-    console.log(location)
-    map.setView(position, 13);
-  }, [position]);
+    if (position) {
+      map.setView(position, 13);
+    }
+  }, [position, map]);
   return null;
 };
 
+// 🎯 Handle user clicks on map
 const MapClickHandler = ({ setShowMap }) => {
   const { setLocation } = useLanguage();
-
   useMapEvents({
     click(e) {
       setLocation(e.latlng);
-
-
-      setShowMap(false); // optional: close after click
+      if (setShowMap) setShowMap(false);
       console.log("🖱️ Clicked at:", e.latlng);
     },
   });
-
   return null;
 };
 
@@ -55,55 +54,60 @@ const Map = ({ setShowMap }) => {
             lng: pos.coords.longitude,
           };
           setLocation(coords);
-          setShowMap(false);
+          if (setShowMap) setShowMap(false);
           console.log("📍 GPS location set:", coords);
-          
-          console.log(location)
-          
         },
         (err) => {
           console.error("Location error:", err);
-          alert("Failed to get location.");
+          alert("Failed to get your location.");
         }
       );
     }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-md p-4 border border-gray-300 mb-4">
+    <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-2xl p-6 border border-gray-200 mb-6 max-w-3xl mx-auto">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">🌍 Choose Your Location</h2>
+
       <button
         onClick={handleGetLocation}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-md transition-all mb-4"
       >
         📍 Use Current Location
       </button>
 
-      <MapContainer
-        center={location || [17.385, 78.4867]} // fallback to Hyderabad
-        zoom={13}
-        style={{
-          aspectRatio: "1",
-          width: "50%",
-          margin: "0 auto",
-          borderRadius: "50%",
-        }}
-      >
-        <TileLayer
-          attribution="© OpenStreetMap"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapClickHandler setShowMap={setShowMap} />
-        {location && <RecenterMap position={location} />}
-        {location && (
-          <Marker position={location}>
-            <Popup>
-              📍 Selected Location <br />
-              Lat: {location.lat.toFixed(3)} <br />
-              Lon: {location.lng.toFixed(3)}
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
+      <div className="rounded-2xl overflow-hidden border-2 border-blue-200">
+        <MapContainer
+          center={location || [17.385, 78.4867]} // Default: Hyderabad
+          zoom={13}
+          style={{
+            height: "320px",
+            width: "100%",
+            borderRadius: "1rem",
+          }}
+          className="z-0"
+        >
+          <TileLayer
+            attribution="© OpenStreetMap contributors"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          <MapClickHandler setShowMap={setShowMap} />
+          {location && <RecenterMap position={location} />}
+
+          {location && (
+            <Marker position={location}>
+              <Popup className="text-sm font-medium">
+                📍 Selected Location
+                <br />
+                Lat: {location.lat.toFixed(3)}
+                <br />
+                Lon: {location.lng.toFixed(3)}
+              </Popup>
+            </Marker>
+          )}
+        </MapContainer>
+      </div>
     </div>
   );
 };

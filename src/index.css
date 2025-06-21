@@ -1,1 +1,30 @@
-/* @import "tailwindcss"; */
+@import "tailwindcss";
+/* style.css or tailwind classes inline */
+.parent {
+  display: grid;
+  
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  grid-gap: 16px;
+  background-image: linear-gradient(to bottom right, #e6d80f, #9ac6e69b);
+
+}
+
+.div1 { grid-area: 1 / 1 / 5 / 5; }
+.div2 { grid-area: 1 / 5 / 5 / 8; }
+.div3 { grid-area: 5 / 1 / 11 / 6; }
+.div4 { grid-area: 5 / 6 / 11 / 8; }
+
+
+.glass-card {
+  background: rgba(44, 240, 221, 0.601);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.home{
+    background:linear-gradient(rgba(15, 189, 90, 0.536),rgba(0, 255, 255, 0.593));
+   
+}
+

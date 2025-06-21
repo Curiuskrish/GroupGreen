@@ -8,6 +8,10 @@ const Graphs = ({ lat, lon, crop }) => {
   const rateChartRef = useRef(null);
   const profitChartRef = useRef(null);
 
+  const yieldChartInstance = useRef(null);
+  const rateChartInstance = useRef(null);
+  const profitChartInstance = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [cropName, setCropName] = useState('');
   const [error, setError] = useState('');
@@ -34,17 +38,11 @@ Do NOT return markdown or explanation.
     `.trim();
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-
     const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
       }),
     });
 
@@ -53,68 +51,32 @@ Do NOT return markdown or explanation.
     return raw.trim().replace(/```json|```/g, '');
   };
 
-  const displayCharts = (data) => {
-    if (!yieldChartRef.current || !rateChartRef.current || !profitChartRef.current) return;
+  const renderChart = (ctx, data, label, color, instanceRef) => {
+    if (instanceRef.current) {
+      instanceRef.current.destroy();
+    }
 
-    const commonOptions = {
+    instanceRef.current = new Chart(ctx, {
       type: 'line',
+      data: {
+        labels: data.years,
+        datasets: [
+          {
+            label,
+            data: data[label.toLowerCase().split(' ')[0]], // maps to yields, rates, profits
+            borderColor: color,
+            backgroundColor: `${color}1A`, // ~10% alpha
+            tension: 0.3,
+            borderWidth: 2,
+            fill: true,
+          },
+        ],
+      },
       options: {
         responsive: true,
-        plugins: { legend: { position: 'bottom' } },
-      },
-    };
-
-    new Chart(yieldChartRef.current, {
-      ...commonOptions,
-      data: {
-        labels: data.years,
-        datasets: [
-          {
-            label: 'Yield (kg/acre)',
-            data: data.yields,
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.3,
-            borderWidth: 2,
-            fill: true,
-          },
-        ],
-      },
-    });
-
-    new Chart(rateChartRef.current, {
-      ...commonOptions,
-      data: {
-        labels: data.years,
-        datasets: [
-          {
-            label: 'Market Rate (₹/kg)',
-            data: data.rates,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.3,
-            borderWidth: 2,
-            fill: true,
-          },
-        ],
-      },
-    });
-
-    new Chart(profitChartRef.current, {
-      ...commonOptions,
-      data: {
-        labels: data.years,
-        datasets: [
-          {
-            label: 'Profit Estimate (₹)',
-            data: data.profits,
-            borderColor: '#f97316',
-            backgroundColor: 'rgba(249, 115, 22, 0.1)',
-            tension: 0.3,
-            borderWidth: 2,
-            fill: true,
-          },
-        ],
+        plugins: {
+          legend: { position: 'bottom' },
+        },
       },
     });
   };
@@ -128,20 +90,28 @@ Do NOT return markdown or explanation.
 
       try {
         const raw = await askGemini(lat, lon, crop);
-        const data = JSON.parse(raw);
+        const json = JSON.parse(raw);
+
+        const { crop: cropLabel, years, yields, rates, profits } = json;
 
         if (
-          !data?.years || !data?.yields || !data?.rates || !data?.profits ||
-          data.years.length !== 10 || data.yields.length !== 10 || data.rates.length !== 10 || data.profits.length !== 10
+          !Array.isArray(years) || !Array.isArray(yields) ||
+          !Array.isArray(rates) || !Array.isArray(profits) ||
+          years.length !== 10
         ) {
-          throw new Error('Incomplete or invalid Gemini data');
+          throw new Error('Invalid or incomplete data');
         }
 
-        setCropName(data.crop);
-        setTimeout(() => displayCharts(data), 100);
+        setCropName(cropLabel || crop);
+
+        setTimeout(() => {
+          renderChart(yieldChartRef.current, json, 'Yield (kg/acre)', '#3b82f6', yieldChartInstance);
+          renderChart(rateChartRef.current, json, 'Market Rate (₹/kg)', '#10b981', rateChartInstance);
+          renderChart(profitChartRef.current, json, 'Profit Estimate (₹)', '#f97316', profitChartInstance);
+        }, 100);
       } catch (err) {
         console.error('🚨 Gemini error:', err);
-        setError('Failed to load real crop data. Try again later.');
+        setError('Failed to load crop statistics. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -150,13 +120,13 @@ Do NOT return markdown or explanation.
     fetchData();
   }, [lat, lon, crop]);
 
-  if (loading) return <p className="text-center text-gray-500 mt-4">🌾 Fetching crop data for your location...</p>;
+  if (loading) return <p className="text-center text-gray-500 mt-4">🌾 Fetching historical crop data...</p>;
   if (error) return <p className="text-red-600 text-center mt-4">{error}</p>;
 
   return (
-    <div className="p-4 max-w-4xl mx-auto space-y-8">
+    <div className="p-4 max-w-4xl mx-auto space-y-10">
       <h2 className="text-2xl font-bold text-green-800 text-center">
-        📊 {cropName} Yield & Profit Analysis (10 Years)
+        📊 {cropName} Yield & Profit Trends (10 Years)
       </h2>
 
       <div>

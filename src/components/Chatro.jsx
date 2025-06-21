@@ -30,12 +30,11 @@ const Chatro = ({ room }) => {
         id: doc.id,
       }));
       setMessages(msgs);
-      // setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      
     });
     return () => unsub();
   }, [room, msgRef]);
 
-  // Fetch All Available Chatrooms
   useEffect(() => {
     const fetchRooms = async () => {
       const snapshot = await getDocs(roomCollectionRef);
@@ -44,27 +43,14 @@ const Chatro = ({ room }) => {
     fetchRooms();
   }, [roomCollectionRef]);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const trimmed = newMsg.trim();
-  //   if (!trimmed) return;
 
-  //   // Create chatroom if it doesn’t exist
-  //   await addDoc(msgRef, {
-  //     text: trimmed,
-  //     createAt: serverTimestamp(),
-  //     user: auth.currentUser?.displayName || "Anonymous",
-  //   });
-
-  //   setMsg("");
-  // };
 const handleSubmit = async (e) => {
   e.preventDefault();
   const trimmed = newMsg.trim();
   if (!trimmed) return;
 
   // 🔒 Ensure chatroom exists with `name` field
-  const roomRef = doc(db, "chatrooms", room); // reference to the chatroom doc
+  const roomRef = doc(db, "chatrooms", room); 
   const roomSnap = await getDoc(roomRef);
 
   if (!roomSnap.exists()) {

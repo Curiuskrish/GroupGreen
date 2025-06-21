@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Loader, Upload, Leaf } from 'lucide-react';
 import { Client } from '@gradio/client';
 
-const HUGGINGFACE_TOKEN = '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';
+const HUGGINGFACE_TOKEN = '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';
 const GEMINI_API_KEY = 'AIzaSyCrfTRsygEaIl6ndzu3FJrbFAfMyg5n37M';
 
 const PlantDiseaseUI = () => {

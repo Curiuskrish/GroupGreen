@@ -144,13 +144,13 @@ const  Schemes = () => {
     case 4:
       return "https://pmfby.gov.in/";
     case 5:
-      return "https://www.agricoop.nic.in/en/content/national-mission-horticulture-nmh";
+      return "https://www.pmksy.gov.in/";
     case 6:
-      return "https://www.agricoop.nic.in/en/content/national-mission-agricultural-automation-nmaa";
+      return "https://www.soilhealth.dac.gov.in/home";
     case 7:
-      return "https://www.agricoop.nic.in/en/content/national-mission-agricultural-education-nmae";
+      return "https://dmsouthwest.delhi.gov.in/scheme/paramparagat-krishi-vikas-yojana/";
     case 8:
-      return "https://www.agricoop.nic.in/en/content/national-mission-agricultural-research-nmar";
+      return "http://nfsm.gov.in/";
     case 9:
       return "https://www.agricoop.nic.in/en/content/national-mission-agricultural-extension-nmae";
     default:
@@ -169,7 +169,7 @@ const  Schemes = () => {
       
       <div className="max-w-3xl mx-auto py-6 space-y-8">
       {schemes.map((scheme, idx) => (
-       <div className="">
+       <div key={idx} className="">
             <a href={getSchemeUrl(idx)}
               target="_blank" rel="noopener noreferrer">
          <div

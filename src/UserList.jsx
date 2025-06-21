@@ -5,14 +5,14 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 
 const UserList = ({ setRoom }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔼 Upvote / Downvote Logic
+  // 🔼 Vote Logic
   const voteOnUser = async (targetUserId, voteType) => {
     const voterId = auth.currentUser.uid;
     const userRef = doc(db, "users", targetUserId);
@@ -44,12 +44,12 @@ const UserList = ({ setRoom }) => {
     await updateDoc(userRef, {
       trustScore: newTrust,
       upvotedBy,
-      downvotedBy
+      downvotedBy,
     });
 
     console.log("✅ Voted:", voteType, "New Score:", newTrust);
 
-    // Refresh that user’s trust score in UI
+    // Reflect updated score in UI
     setUsers((prevUsers) =>
       prevUsers.map((u) =>
         u.id === targetUserId
@@ -59,7 +59,7 @@ const UserList = ({ setRoom }) => {
     );
   };
 
-  // 💬 Start private chat
+  // 💬 Start Chat with a user
   const handleStartChat = (otherUser) => {
     const currentUser = auth.currentUser;
     const chatRoomId =
@@ -69,6 +69,7 @@ const UserList = ({ setRoom }) => {
     setRoom(chatRoomId);
   };
 
+  // 🔁 Fetch users (except current)
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -79,7 +80,7 @@ const UserList = ({ setRoom }) => {
           .filter((doc) => doc.id !== currentUid)
           .map((doc) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           }));
 
         setUsers(userList);
@@ -93,18 +94,17 @@ const UserList = ({ setRoom }) => {
     fetchUsers();
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="text-center mt-10 text-green-600">
         🌾 Loading users...
       </div>
     );
+  }
 
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white p-6 shadow-lg rounded-lg border border-green-300">
-      <h2 className="text-xl font-bold text-green-700 mb-4">
-        👥 Other Users
-      </h2>
+      <h2 className="text-xl font-bold text-green-700 mb-4">👥 Other Users</h2>
       <ul className="divide-y divide-green-200">
         {users.map((user) => (
           <li
@@ -112,7 +112,7 @@ const UserList = ({ setRoom }) => {
             className="py-3 flex items-center space-x-4 relative"
           >
             <img
-              src={user.photoURL}
+              src={user.photoURL || "/default-avatar.png"}
               alt={user.name}
               className="w-10 h-10 rounded-full border border-green-400"
             />
@@ -151,7 +151,3 @@ const UserList = ({ setRoom }) => {
 };
 
 export default UserList;
-// ...existing code...
-
-
-// ...existing code...

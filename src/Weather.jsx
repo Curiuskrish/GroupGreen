@@ -3,7 +3,7 @@ import axios from "axios";
 
 const WeatherApp = ({ lat, lon }) => {
   const [forecastData, setForecastData] = useState([]);
-  const apiKey = "77eb8bc44952b0c2a97636521fa83e43";
+  const apiKey = "77eb8bc44952b0c2a97636521fa83e43"; // ⚠️ Move to .env for production
 
   useEffect(() => {
     const fetchForecast = async () => {
@@ -17,6 +17,7 @@ const WeatherApp = ({ lat, lon }) => {
           },
         });
 
+        // Pick forecast around 12 PM for each day
         const dailyForecasts = res.data.list.filter(item =>
           item.dt_txt.includes("12:00:00")
         );
@@ -49,7 +50,7 @@ const WeatherApp = ({ lat, lon }) => {
                 })}
               </p>
               <p className="text-gray-700 text-sm">🌡️ Temp: {day.main.temp}°C</p>
-              <p className="text-gray-700 text-sm">🌤️ {day.weather[0].description}</p>
+              <p className="text-gray-700 text-sm capitalize">🌤️ {day.weather[0].description}</p>
               <p className="text-gray-700 text-sm">💧 Humidity: {day.main.humidity}%</p>
               <p className="text-gray-700 text-sm">🌬️ Wind: {day.wind.speed} m/s</p>
             </div>
