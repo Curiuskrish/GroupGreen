@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLanguage } from "./LanguageContext";
 import MiniChat from "./MiniChat";
@@ -7,37 +6,36 @@ import UserList from "./UserList";
 import LocationModal from "./LocationModal";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import ChatroomImg from "../src/assets/Chatroom.png";
+import CropImg from "../src/assets/Crop.png";
+import DImg from "../src/assets/d.png";
+import SchemesImg from "../src/assets/Schemes.png";
 
 const Dashboard = () => {
   const { location, setLocation } = useLanguage();
 
-  const carouselItems = [
-    {
-      img:"https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80" ,
-      title: "Smart Soil Sensors 🌱",
-      desc: "Track real-time soil moisture for optimal watering.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
-      title: "AI Crop Advisor 🤖",
-      desc: "Get AI-powered crop guidance based on weather & soil.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1606149055000-72615d239b6e?auto=format&fit=crop&w=800&q=80",
-      title: "Drone Monitoring 🚁",
-      desc: "Aerial monitoring for disease detection & coverage.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1606149055000-72615d239b6e?auto=format&fit=crop&w=800&q=80",
-      title: "Drone Monitoring 🚁",
-      desc: "Aerial monitoring for disease detection & coverage.",
-    },
-    {
-      img: "https://images.unsplash.com/photo-1606149055000-72615d239b6e?auto=format&fit=crop&w=800&q=80",
-      title: "Drone Monitoring 🚁",
-      desc: "Aerial monitoring for disease detection & coverage.",
-    },
-  ];
+ const carouselItems = [
+  {
+    img: ChatroomImg,
+    title: "Community Chatroom",
+    desc: "Connect with nearby farmers and share insights.",
+  },
+  {
+    img: CropImg,
+    title: "Smart Crop Advisor",
+    desc: "AI recommends crops based on your soil and weather.",
+  },
+  {
+    img: DImg,
+    title: "Drone Monitoring",
+    desc: "Real-time drone footage for crop health and safety.",
+  },
+  {
+    img: SchemesImg,
+    title: "Govt Schemes & Support",
+    desc: "Get updates on farming schemes and financial aid.",
+  },
+];
 
   return (
     <div className="bg-[#0b0f0f] text-white min-h-screen p-4 md:p-6 font-sans">
