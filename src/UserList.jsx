@@ -105,47 +105,51 @@ const UserList = ({ setRoom }) => {
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white p-6 shadow-lg rounded-lg border border-green-300">
       <h2 className="text-xl font-bold text-green-700 mb-4">👥 Other Users</h2>
-      <ul className="divide-y divide-green-200">
-        {users.map((user) => (
-          <li
-            key={user.id}
-            className="py-3 flex items-center space-x-4 relative"
-          >
-            <img
-              src={user.photoURL || "/default-avatar.png"}
-              alt={user.name}
-              className="w-10 h-10 rounded-full border border-green-400"
-            />
-            <div className="text-left">
-              <p className="font-medium text-gray-800">{user.name}</p>
-              <p className="text-sm text-gray-500">{user.email}</p>
-              <p className="text-sm font-semibold text-yellow-700">
-                🌟 Trust: {user.trustScore ?? 100}
-              </p>
-              <div className="flex gap-2 mt-1">
-                <button
-                  onClick={() => voteOnUser(user.id, "upvote")}
-                  className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
-                >
-                  👍
-                </button>
-                <button
-                  onClick={() => voteOnUser(user.id, "downvote")}
-                  className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                >
-                  👎
-                </button>
-              </div>
-            </div>
-            <button
-              onClick={() => handleStartChat(user)}
-              className="ml-auto bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              💬 Chat
-            </button>
-          </li>
-        ))}
-      </ul>
+    <ul className="divide-y divide-green-200">
+  {users.map((user) => (
+    <li
+      key={user.id}
+      className="py-4 px-2 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-3 sm:space-y-0"
+    >
+      <div className="flex items-center space-x-3">
+        <img
+          src={user.photoURL || "/default-avatar.png"}
+          alt={user.name}
+          className="w-10 h-10 rounded-full border border-green-400"
+        />
+        <div>
+          <p className="font-medium text-gray-800">{user.name}</p>
+          {/* <p className="text-sm text-gray-500">{user.email}</p> */}
+          <p className="text-sm font-semibold text-yellow-700">
+            🌟 Trust: {user.trustScore ?? 100}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:flex-nowrap">
+        <button
+          onClick={() => voteOnUser(user.id, "upvote")}
+          className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+        >
+          👍
+        </button>
+        <button
+          onClick={() => voteOnUser(user.id, "downvote")}
+          className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+        >
+          👎
+        </button>
+        <button
+          onClick={() => handleStartChat(user)}
+          className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
+        >
+          💬 Chat
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };

@@ -17,7 +17,7 @@ const ChatBot = () => {
   }, [messages]);
 
   const askGemini = async (topic) => {
-    const defaultPrompt = `respond to give ${topic} ,give response only in ${language} language`;
+    const defaultPrompt = `respond to give ${topic} ,give response only in ${language} language,dont say ok `;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
