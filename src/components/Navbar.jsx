@@ -43,26 +43,28 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 px-6 py-3 sm:py-4 backdrop-blur-md transition-colors duration-300 shadow-md ${
+      className={`sticky top-0 z-50 w-full px-6 py-3 sm:py-4 transition-all duration-300 backdrop-blur-lg shadow ${
         scrolled
-          ? "bg-white/80 border-b border-white/20"
-          : "bg-gradient-to-r from-green-300/30 via-white/30 to-green-300/30"
+          ? "bg-white/80 border-b border-gray-200"
+          : "bg-gradient-to-r from-green-100/70 via-white/50 to-green-100/70"
       }`}
     >
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl sm:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-700 via-lime-500 to-green-700 drop-shadow-sm">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <h1 className="text-xl sm:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-800 via-lime-600 to-green-800 drop-shadow-sm">
           🌿 GreenApp {language && `| 🌐 ${language}`}
         </h1>
 
+        {/* Mobile Menu Toggle */}
         <div className="sm:hidden">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="text-green-700"
+            className="text-green-700 hover:text-green-900 transition"
           >
             {menuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
+        {/* Desktop Menu */}
         <div className="hidden sm:flex items-center gap-4">
           {isAuth && (
             <>
@@ -80,13 +82,13 @@ const Navbar = () => {
           {isAuth ? (
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 transition duration-300 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-200"
             >
               🔓 Logout
             </button>
           ) : (
             <NavLink to="/login">
-              <button className="bg-green-500 hover:bg-green-600 transition duration-300 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105">
+              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-200">
                 🔐 Login
               </button>
             </NavLink>
@@ -94,8 +96,9 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {menuOpen && (
-        <div className="sm:hidden mt-4 flex flex-col gap-3 items-start transition-all duration-300">
+        <div className="sm:hidden mt-4 flex flex-col gap-3 animate-fade-in-down">
           {isAuth && (
             <>
               <NavItem to="/" label="🏠 Home" />
@@ -112,13 +115,13 @@ const Navbar = () => {
           {isAuth ? (
             <button
               onClick={handleLogout}
-              className="w-full bg-red-500 hover:bg-red-600 transition duration-300 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105"
+              className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105 transition duration-200"
             >
               🔓 Logout
             </button>
           ) : (
             <NavLink to="/login" className="w-full">
-              <button className="w-full bg-green-500 hover:bg-green-600 transition duration-300 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105">
+              <button className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-md hover:scale-105 transition duration-200">
                 🔐 Login
               </button>
             </NavLink>
@@ -133,10 +136,10 @@ const NavItem = ({ to, label }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `px-3 py-2 text-sm sm:text-base rounded-lg font-medium transition duration-200 hover:scale-105 shadow-sm ${
+      `px-3 py-2 text-sm sm:text-base rounded-lg font-medium transition duration-200 hover:scale-105 ${
         isActive
-          ? "bg-green-200 text-green-800"
-          : "text-gray-700 hover:bg-white/40"
+          ? "bg-green-200 text-green-800 shadow-sm"
+          : "text-gray-700 hover:bg-green-50"
       }`
     }
   >

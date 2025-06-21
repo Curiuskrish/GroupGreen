@@ -6,10 +6,12 @@ import {
   query,
   serverTimestamp,
   getDocs,
+  doc,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore"; 
 
 const Chatro = ({ room }) => {
   const msgRef = collection(db, "chatrooms", room, "messages");
@@ -21,7 +23,7 @@ const Chatro = ({ room }) => {
   const [newMsg, setMsg] = useState("");
   const bottomRef = useRef(null);
 
-  // Fetch Messages for Current Room
+  // 📥 Fetch messages in real-time
   useEffect(() => {
     const queryMsg = query(msgRef, orderBy("createAt"));
     const unsub = onSnapshot(queryMsg, (snapshot) => {
@@ -30,58 +32,61 @@ const Chatro = ({ room }) => {
         id: doc.id,
       }));
       setMessages(msgs);
-      
     });
     return () => unsub();
-  }, [room, msgRef]);
+  }, [room]);
 
+  // 📦 Fetch all chatrooms
   useEffect(() => {
     const fetchRooms = async () => {
       const snapshot = await getDocs(roomCollectionRef);
       setAllRooms(snapshot.docs.map((doc) => doc.id));
     };
     fetchRooms();
-  }, [roomCollectionRef]);
+  }, []);
 
+  // 📝 Submit a new message
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmed = newMsg.trim();
+    if (!trimmed) return;
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const trimmed = newMsg.trim();
-  if (!trimmed) return;
+    const roomRef = doc(db, "chatrooms", room);
+    const roomSnap = await getDoc(roomRef);
 
-  // 🔒 Ensure chatroom exists with `name` field
-  const roomRef = doc(db, "chatrooms", room); 
-  const roomSnap = await getDoc(roomRef);
+    if (!roomSnap.exists()) {
+      await setDoc(roomRef, {
+        name: room,
+        createdAt: serverTimestamp(),
+      });
+      console.log(`✅ Created chatroom: ${room}`);
+    }
 
-  if (!roomSnap.exists()) {
-    // 🚀 If the chatroom doesn't exist, create it
-    await setDoc(roomRef, {
-      name: room,
-      createdAt: serverTimestamp(),
+    await addDoc(msgRef, {
+      text: trimmed,
+      createAt: serverTimestamp(),
+      user: auth.currentUser?.displayName || "Anonymous",
     });
-    console.log(`✅ Created chatroom: ${room}`);
-  }
 
-  // 💬 Add the message
-  await addDoc(msgRef, {
-    text: trimmed,
-    createAt: serverTimestamp(),
-    user: auth.currentUser?.displayName || "Anonymous",
-  });
+    setMsg("");
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
 
-  setMsg("");
-};
+  // 🔍 Filter messages by search term
   const filteredMessages = messages.filter((msg) =>
     msg.text.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="flex flex-col max-w-2xl mx-auto h-[90vh] bg-white shadow-lg rounded-xl overflow-hidden border border-green-300">
+      {/* 🧭 Header */}
       <header className="bg-green-600 text-white py-4 px-6 text-xl font-bold text-center">
         🌱 Chatroom: <span className="italic">{room}</span>
       </header>
 
-      {/* 🔍 Search Messages */}
+      {/* 🔍 Search bar */}
       <div className="p-2 bg-green-50 border-b border-green-200">
         <input
           type="text"
@@ -118,7 +123,7 @@ const handleSubmit = async (e) => {
         <div ref={bottomRef}></div>
       </div>
 
-      {/* ✍️ Send Message */}
+      {/* ✍️ Input */}
       <form
         onSubmit={handleSubmit}
         className="flex items-center p-4 border-t border-gray-300 bg-white"
@@ -138,7 +143,7 @@ const handleSubmit = async (e) => {
         </button>
       </form>
 
-      {/* 📜 All Available Rooms */}
+      {/* 📂 Available Rooms */}
       <div className="bg-green-100 p-3 text-sm border-t border-green-300 overflow-y-auto max-h-32">
         <h3 className="font-semibold mb-2 text-green-800">📁 Available Rooms:</h3>
         <ul className="flex flex-wrap gap-2">

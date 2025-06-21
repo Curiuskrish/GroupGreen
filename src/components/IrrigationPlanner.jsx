@@ -27,8 +27,8 @@ const IrrigationPlanner = () => {
       const res = await fetch(url);
       if (!res.ok) throw new Error('Weather API error');
       const data = await res.json();
-      const sliced = data.list.slice(0, 5); // Next 5 intervals (3hr each)
-      
+      const sliced = data.list.slice(0, 5);
+
       const rainForecast = sliced.reduce((total, entry) => {
         const rain = entry.rain?.['3h'] || 0;
         return total + rain;
@@ -52,11 +52,8 @@ const IrrigationPlanner = () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: question }] }],
-        }),
+        body: JSON.stringify({ contents: [{ parts: [{ text: question }] }] }),
       });
-
       const data = await res.json();
       const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no explanation provided.';
 
@@ -65,10 +62,7 @@ const IrrigationPlanner = () => {
                       : lower.includes('no') && !lower.includes('yes') ? '❌ No'
                       : '⚠️ Unclear';
 
-      return {
-        explanation: raw,
-        decision,
-      };
+      return { explanation: raw, decision };
     } catch (err) {
       console.error('Gemini API error:', err);
       throw new Error('Failed to fetch AI advice.');
@@ -97,7 +91,6 @@ const IrrigationPlanner = () => {
 
   const handlePlanIrrigation = async () => {
     setRecommendation(null);
-
     if (!location.lat || !location.lon || !crop || !soilMoisture) {
       setRecommendation({ error: '🚫 Please fill all required fields.' });
       return;
@@ -129,81 +122,55 @@ const IrrigationPlanner = () => {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded-2xl shadow-md space-y-4 font-sans">
-      <h2 className="text-3xl font-bold text-blue-800">💧 Irrigation Planner</h2>
+    <div className="p-6 max-w-4xl mx-auto bg-white rounded-3xl shadow-lg space-y-6 border border-gray-200">
+      <h2 className="text-3xl font-bold text-blue-800 text-center">💧 Smart Irrigation Planner</h2>
 
-      <div className="space-y-2">
-        <input
-          type="number"
-          placeholder="Latitude"
-          className="w-full p-2 border rounded"
-          value={location.lat}
-          onChange={(e) => setLocation({ ...location, lat: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Longitude"
-          className="w-full p-2 border rounded"
-          value={location.lon}
-          onChange={(e) => setLocation({ ...location, lon: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Crop Type (e.g., wheat)"
-          className="w-full p-2 border rounded"
-          value={crop}
-          onChange={(e) => setCrop(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Soil Moisture (%)"
-          className="w-full p-2 border rounded"
-          value={soilMoisture}
-          onChange={(e) => setSoilMoisture(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Farm Size (acres) [optional]"
-          className="w-full p-2 border rounded"
-          value={farmSize}
-          onChange={(e) => setFarmSize(e.target.value)}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input type="number" placeholder="Latitude" className="p-3 border rounded-lg bg-gray-50" value={location.lat} onChange={(e) => setLocation({ ...location, lat: e.target.value })} />
+        <input type="number" placeholder="Longitude" className="p-3 border rounded-lg bg-gray-50" value={location.lon} onChange={(e) => setLocation({ ...location, lon: e.target.value })} />
+        <input type="text" placeholder="Crop Type (e.g., wheat)" className="p-3 border rounded-lg bg-gray-50" value={crop} onChange={(e) => setCrop(e.target.value)} />
+        <input type="number" placeholder="Soil Moisture (%)" className="p-3 border rounded-lg bg-gray-50" value={soilMoisture} onChange={(e) => setSoilMoisture(e.target.value)} />
+        <input type="number" placeholder="Farm Size (acres) [optional]" className="p-3 border rounded-lg bg-gray-50 sm:col-span-2" value={farmSize} onChange={(e) => setFarmSize(e.target.value)} />
       </div>
 
-      <button
-        onClick={handlePlanIrrigation}
-        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        disabled={loading}
-      >
-        {loading ? 'Calculating...' : 'Plan Irrigation'}
+      <button onClick={handlePlanIrrigation} className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition" disabled={loading}>
+        {loading ? '🔄 Calculating...' : '📊 Plan Irrigation'}
       </button>
 
       {recommendation && (
-        <div className="mt-4 p-4 bg-gray-50 rounded space-y-4 text-sm">
+        <div className="p-5 bg-gray-50 border border-gray-200 rounded-xl space-y-4">
           {recommendation.error ? (
             <p className="text-red-600 font-semibold">{recommendation.error}</p>
           ) : (
             <>
-              <p><strong>🌧 Forecasted Rain:</strong> {recommendation.rain} mm</p>
-              <p><strong>🚿 Should Irrigate?</strong> {recommendation.shouldIrrigate}</p>
-              <p><strong>🧠 Reason:</strong> {recommendation.explanation}</p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="bg-white p-3 rounded-xl border border-blue-200 shadow-sm">
+                  <p className="text-sm text-gray-600">🌧 Forecasted Rain</p>
+                  <p className="text-lg font-bold text-blue-700">{recommendation.rain} mm</p>
+                </div>
+
+                <div className="bg-white p-3 rounded-xl border border-green-200 shadow-sm">
+                  <p className="text-sm text-gray-600">🚿 Should Irrigate?</p>
+                  <p className="text-lg font-bold text-green-700">{recommendation.shouldIrrigate}</p>
+                </div>
+              </div>
+
+              <div className="text-gray-700 whitespace-pre-wrap">
+                <strong>🧠 Reason:</strong> {recommendation.explanation}
+              </div>
 
               {recommendation.waterEstimate && (
-                <div className="grid gap-4">
-                  <div className="bg-blue-50 rounded p-2 border border-blue-200">
-                    <p><strong>💦 Water Requirement:</strong></p>
-                    <ul className="list-disc ml-5">
+                <div className="space-y-4">
+                  <div className="bg-white p-4 rounded-xl border border-gray-300">
+                    <p className="font-semibold text-blue-700 mb-1">💦 Water Requirement</p>
+                    <ul className="list-disc ml-5 text-sm text-gray-700">
                       <li><strong>Per Acre:</strong> {recommendation.waterEstimate.perAcre.toLocaleString()} litres</li>
                       <li><strong>Total:</strong> {recommendation.waterEstimate.total.toLocaleString()} litres</li>
                     </ul>
                   </div>
 
                   <WaterBudgetGauge min={recommendation.waterEstimate.min} max={recommendation.waterEstimate.max} />
-                  <MoistureBar
-                    moisture={parseFloat(soilMoisture)}
-                    optimal={recommendation.waterEstimate.optimalMoisture}
-                    rain={parseFloat(recommendation.rain)}
-                  />
+                  <MoistureBar moisture={parseFloat(soilMoisture)} optimal={recommendation.waterEstimate.optimalMoisture} rain={parseFloat(recommendation.rain)} />
                   <RainForecastChart data={rainForecastData} />
                 </div>
               )}
