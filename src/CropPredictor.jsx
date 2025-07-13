@@ -125,7 +125,7 @@ if (json.crops && json.crops.length > 0 && json.crops[0] !== "no crops") {
     };
 
     fetchCrops();
-  }, [lat, lon]);
+  }, [lat, lon,setCropDrop]);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-green-50 min-h-[20vh]">
